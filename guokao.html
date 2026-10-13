@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>国考一个月 · 考点待办清单</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #f5f7fc;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      padding: 2rem 1rem;
+      color: #1e293b;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    /* 头部 */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #0b2b4b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .header h1 span {
+      background: #1e4a7a;
+      color: white;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      letter-spacing: 0.3px;
+    }
+
+    .subhead {
+      color: #475569;
+      margin-top: 0.6rem;
+      font-size: 1rem;
+      border-bottom: 1px solid #d9e2ef;
+      padding-bottom: 1rem;
+      display: inline-block;
+      padding-left: 1rem;
+      padding-right: 1rem;
+    }
+
+    /* 进度卡片 */
+    .progress-card {
+      background: white;
+      border-radius: 24px;
+      box-shadow: 0 8px 20px rgba(0, 20, 40, 0.06);
+      padding: 1.5rem 2rem;
+      margin-bottom: 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      border: 1px solid #e9eef5;
+    }
+
+    .progress-stats {
+      display: flex;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #0b2b4b;
+    }
+
+    .stat-value small {
+      font-size: 1rem;
+      font-weight: 400;
+      color: #64748b;
+    }
+
+    .progress-bar-bg {
+      flex: 1;
+      min-width: 200px;
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #1e4a7a, #2b6cb0);
+      border-radius: 20px;
+      transition: width 0.3s ease;
+    }
+
+    /* 科目导航 */
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem;
+      margin-bottom: 2rem;
+      justify-content: center;
+    }
+
+    .nav-btn {
+      background: white;
+      border: 1px solid #cfddee;
+      padding: 0.6rem 1.2rem;
+      border-radius: 40px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #1e4a7a;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .nav-btn:hover {
+      background: #eef4ff;
+      border-color: #8aafd4;
+    }
+
+    .nav-btn.active {
+      background: #1e4a7a;
+      border-color: #1e4a7a;
+      color: white;
+      box-shadow: 0 6px 12px rgba(30, 74, 122, 0.2);
+    }
+
+    /* 任务面板 */
+    .subject-panel {
+      display: none;
+    }
+
+    .subject-panel.active {
+      display: block;
+    }
+
+    .category-card {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 6px 16px rgba(0, 20, 40, 0.04);
+      margin-bottom: 1.5rem;
+      padding: 1.2rem 1.5rem 1.5rem 1.5rem;
+      border: 1px solid #e9eef5;
+      transition: box-shadow 0.2s;
+    }
+
+    .category-card:hover {
+      box-shadow: 0 10px 24px rgba(0, 20, 40, 0.08);
+    }
+
+    .category-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0b2b4b;
+      margin-bottom: 0.8rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #e3eaf2;
+    }
+
+    .category-title .badge {
+      font-size: 0.8rem;
+      background: #e8f0fe;
+      color: #1e4a7a;
+      padding: 0.2rem 0.9rem;
+      border-radius: 30px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+    }
+
+    .task-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .task-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      padding: 0.6rem 0.6rem 0.6rem 0.2rem;
+      border-radius: 12px;
+      transition: background 0.15s;
+      cursor: pointer;
+      user-select: none;
+      border-bottom: 1px solid #f0f4fa;
+    }
+
+    .task-item:last-child {
+      border-bottom: none;
+    }
+
+    .task-item:hover {
+      background: #f8fbff;
+    }
+
+    .task-check {
+      appearance: none;
+      width: 1.4rem;
+      height: 1.4rem;
+      border: 2px solid #b9cbe0;
+      border-radius: 8px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      transition: all 0.15s;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .task-check:checked {
+      background: #1e4a7a;
+      border-color: #1e4a7a;
+    }
+
+    .task-check:checked::after {
+      content: "✓";
+      color: white;
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    .task-text {
+      flex: 1;
+      font-size: 0.98rem;
+      line-height: 1.5;
+      color: #1e293b;
+      padding-top: 0.1rem;
+    }
+
+    .task-item.done .task-text {
+      text-decoration: line-through;
+      color: #94a3b8;
+    }
+
+    .task-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 0.2rem 0.7rem;
+      border-radius: 30px;
+      white-space: nowrap;
+      align-self: center;
+      margin-left: 0.5rem;
+      letter-spacing: 0.2px;
+    }
+
+    .task-tag.hot {
+      background: #fee9e7;
+      color: #b53b2e;
+    }
+
+    .task-tag.must {
+      background: #e2f0e6;
+      color: #1e6b3b;
+    }
+
+    /* 重置按钮 */
+    .reset-area {
+      text-align: center;
+      margin-top: 2.5rem;
+    }
+
+    .reset-btn {
+      background: white;
+      border: 1px solid #cfddee;
+      padding: 0.7rem 2rem;
+      border-radius: 40px;
+      font-weight: 500;
+      color: #4b5c70;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .reset-btn:hover {
+      background: #f1f6fd;
+      border-color: #8aafd4;
+      color: #1e4a7a;
+    }
+
+    .footer-note {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #8698aa;
+    }
+
+    /* 平板/手机小屏优化 */
+    @media (max-width: 600px) {
+      body { padding: 1rem 0.7rem; }
+      .header h1 { font-size: 1.5rem; }
+      .progress-card { padding: 1rem 1.2rem; }
+      .progress-stats { gap: 1.2rem; }
+      .stat-value { font-size: 1.4rem; }
+      .category-card { padding: 1rem 1rem 1.2rem; }
+      .category-title { font-size: 1.1rem; }
+      .task-text { font-size: 0.92rem; }
+      .task-tag { font-size: 0.65rem; padding: 0.15rem 0.5rem; }
+      .nav-btn { padding: 0.5rem 0.9rem; font-size: 0.82rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>
+        📋 国考一个月 · 考点待办清单
+        <span>2026</span>
+      </h1>
+      <div class="subhead">按考题类型拆解 · 勾选即完成 · 自动保存</div>
+    </div>
+
+    <!-- 进度卡片 -->
+    <div class="progress-card">
+      <div class="progress-stats">
+        <div class="stat-item">
+          <span class="stat-label">总任务</span>
+          <span class="stat-value" id="totalCount">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">已完成</span>
+          <span class="stat-value" id="doneCount">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">完成率</span>
+          <span class="stat-value" id="percentDisplay">0<small>%</small></span>
+        </div>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressFill" style="width: 0%;"></div>
+      </div>
+    </div>
+
+    <!-- 科目导航 -->
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-btn active" data-subject="all">📌 全部考点</button>
+      <button class="nav-btn" data-subject="data">📊 资料分析</button>
+      <button class="nav-btn" data-subject="judge">⚖️ 判断推理</button>
+      <button class="nav-btn" data-subject="verbal">📖 言语理解</button>
+      <button class="nav-btn" data-subject="politics">🏛️ 政治理论</button>
+      <button class="nav-btn" data-subject="common">🧠 常识判断</button>
+      <button class="nav-btn" data-subject="quantity">🔢 数量关系</button>
+      <button class="nav-btn" data-subject="essay">✍️ 申论</button>
+    </div>
+
+    <!-- 任务面板容器 -->
+    <div id="panelsContainer">
+      <!-- 资料分析 -->
+      <div class="subject-panel active" id="panel-data" data-subject="data">
+        <div class="category-card">
+          <div class="category-title">📊 资料分析 <span class="badge">拿满分区</span></div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="data-1"><input type="checkbox" class="task-check"><span class="task-text">比重问题：现期比重、基期比重、两期比重差（执法类考7道）</span><span class="task-tag hot">高频</span></li>
+            <li class="task-item" data-task-id="data-2"><input type="checkbox" class="task-check"><span class="task-text">增长率：一般增长率计算/比较、混合增长率（十字交叉法）</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="data-3"><input type="checkbox" class="task-check"><span class="task-text">增长量：计算与比较</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="data-4"><input type="checkbox" class="task-check"><span class="task-text">平均数：平均数计算与比较</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="data-5"><input type="checkbox" class="task-check"><span class="task-text">简单计算与比较：直接找数、加减比较（送分题）</span><span class="task-tag">基础</span></li>
+            <li class="task-item" data-task-id="data-6"><input type="checkbox" class="task-check"><span class="task-text">综合分析题：只验证前两项，策略性放弃</span><span class="task-tag">放弃</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 判断推理 -->
+      <div class="subject-panel" id="panel-judge" data-subject="judge">
+        <div class="category-card">
+          <div class="category-title">⚖️ 判断推理 · 图形推理</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="judge-1"><input type="checkbox" class="task-check"><span class="task-text">动态位置（移动、旋转）、定义叠加、对称性、一笔画</span><span class="task-tag hot">高频</span></li>
+            <li class="task-item" data-task-id="judge-2"><input type="checkbox" class="task-check"><span class="task-text">黑白格数量规律</span><span class="task-tag">基础</span></li>
+            <li class="task-item" data-task-id="judge-3"><input type="checkbox" class="task-check"><span class="task-text">立体图形：三视图（俯视+左视推正视图）、空间折叠</span><span class="task-tag hot">创新</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">⚖️ 判断推理 · 定义判断</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="judge-4"><input type="checkbox" class="task-check"><span class="task-text">单定义多定义都练，重点管理学、经济学类（波特五力、动销率）</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="judge-5"><input type="checkbox" class="task-check"><span class="task-text">提取要点比对排除，不追求完全理解</span><span class="task-tag">技巧</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">⚖️ 判断推理 · 类比推理</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="judge-6"><input type="checkbox" class="task-check"><span class="task-text">内涵关系（功用、比例）、外延关系、语义关系</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="judge-7"><input type="checkbox" class="task-check"><span class="task-text">文氏图形式考查概念间关系（2026新题型）</span><span class="task-tag hot">新</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">⚖️ 判断推理 · 逻辑判断</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="judge-8"><input type="checkbox" class="task-check"><span class="task-text">加强型/削弱型（因果关系定性）、翻译推理、前提型</span><span class="task-tag hot">高频</span></li>
+            <li class="task-item" data-task-id="judge-9"><input type="checkbox" class="task-check"><span class="task-text">朴素逻辑一题五问（材料题）· 市地/执法类必练</span><span class="task-tag must">必拿</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 言语理解 -->
+      <div class="subject-panel" id="panel-verbal" data-subject="verbal">
+        <div class="category-card">
+          <div class="category-title">📖 言语理解 · 逻辑填空</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="verbal-1"><input type="checkbox" class="task-check"><span class="task-text">高频成语积累（明察秋毫、束之高阁、按图索骥、左支右绌等）</span><span class="task-tag must">必背</span></li>
+            <li class="task-item" data-task-id="verbal-2"><input type="checkbox" class="task-check"><span class="task-text">关联关系+解释对应混合考查，找准上下文信号</span><span class="task-tag">方法</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">📖 言语理解 · 片段阅读</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="verbal-3"><input type="checkbox" class="task-check"><span class="task-text">主旨题、细节题、标题添加、推断下文题</span><span class="task-tag hot">高频</span></li>
+            <li class="task-item" data-task-id="verbal-4"><input type="checkbox" class="task-check"><span class="task-text">长难句快速划分层次，题干字数增加</span><span class="task-tag">提速</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">📖 言语理解 · 语句表达</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="verbal-5"><input type="checkbox" class="task-check"><span class="task-text">句子排序、句子填空（占比提升）</span><span class="task-tag must">必拿</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 政治理论 -->
+      <div class="subject-panel" id="panel-politics" data-subject="politics">
+        <div class="category-card">
+          <div class="category-title">🏛️ 政治理论（新独立模块）</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="politics-1"><input type="checkbox" class="task-check"><span class="task-text">党的创新理论：中国式现代化、自信自立等（占比约40%）</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="politics-2"><input type="checkbox" class="task-check"><span class="task-text">最新政策文件：“十五五”规划、国家安全体系、民生与人口工作</span><span class="task-tag hot">高频</span></li>
+            <li class="task-item" data-task-id="politics-3"><input type="checkbox" class="task-check"><span class="task-text">减少纯记忆，注重理解政策内涵与落地场景</span><span class="task-tag">策略</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 常识判断 -->
+      <div class="subject-panel" id="panel-common" data-subject="common">
+        <div class="category-card">
+          <div class="category-title">🧠 常识判断 · 性价比低</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="common-1"><input type="checkbox" class="task-check"><span class="task-text">法律：监察法、反洗钱法、税收制度、刑法案例（执法类占35%）</span><span class="task-tag hot">高频</span></li>
+            <li class="task-item" data-task-id="common-2"><input type="checkbox" class="task-check"><span class="task-text">科技/地理：结合应用场景（如运输路线选择）</span><span class="task-tag">理解</span></li>
+            <li class="task-item" data-task-id="common-3"><input type="checkbox" class="task-check"><span class="task-text">考前过一遍时政热点，不专门背</span><span class="task-tag">策略</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 数量关系 -->
+      <div class="subject-panel" id="panel-quantity" data-subject="quantity">
+        <div class="category-card">
+          <div class="category-title">🔢 数量关系 · 只学4类</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="quantity-1"><input type="checkbox" class="task-check"><span class="task-text">工程问题：赋值法，总量设为公倍数</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="quantity-2"><input type="checkbox" class="task-check"><span class="task-text">行程问题：相遇/追及公式，画线段图</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="quantity-3"><input type="checkbox" class="task-check"><span class="task-text">容斥问题：标准型与满足型公式</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="quantity-4"><input type="checkbox" class="task-check"><span class="task-text">利润问题：利润率分母是成本不是售价</span><span class="task-tag must">必拿</span></li>
+            <li class="task-item" data-task-id="quantity-5"><input type="checkbox" class="task-check"><span class="task-text">排列组合、概率、复杂几何 → 放弃，考场挑眼熟做</span><span class="task-tag">放弃</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 申论 -->
+      <div class="subject-panel" id="panel-essay" data-subject="essay">
+        <div class="category-card">
+          <div class="category-title">✍️ 申论 · 归纳概括</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="essay-1"><input type="checkbox" class="task-check"><span class="task-text">概括做法、成效表现、问题原因（2026市地级考两道，占比上升）</span><span class="task-tag hot">高频</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">✍️ 申论 · 综合分析</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="essay-2"><input type="checkbox" class="task-check"><span class="task-text">理解一句话（词句解释），注意“理解准确”要求更高</span><span class="task-tag must">必拿</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">✍️ 申论 · 解决问题/对策</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="essay-3"><input type="checkbox" class="task-check"><span class="task-text">概括问题+提建议组合，原因分析要准</span><span class="task-tag must">必拿</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">✍️ 申论 · 应用文写作</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="essay-4"><input type="checkbox" class="task-check"><span class="task-text">发布词（2026新考）、讲话稿、调研报告、提案</span><span class="task-tag hot">新</span></li>
+            <li class="task-item" data-task-id="essay-5"><input type="checkbox" class="task-check"><span class="task-text">格式分必须拿，内容从材料整合</span><span class="task-tag">策略</span></li>
+          </ul>
+        </div>
+        <div class="category-card">
+          <div class="category-title">✍️ 申论 · 大作文</div>
+          <ul class="task-list">
+            <li class="task-item" data-task-id="essay-6"><input type="checkbox" class="task-check"><span class="task-text">给定句子理解型作文（2026主题“多样性蕴含着创造力”）</span><span class="task-tag hot">高频</span></li>
+            <li class="task-item" data-task-id="essay-7"><input type="checkbox" class="task-check"><span class="task-text">结构清晰（五段三分），论据从材料转化</span><span class="task-tag must">必拿</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- 重置按钮 -->
+    <div class="reset-area">
+      <button class="reset-btn" id="resetAllBtn">
+        <span>↻</span> 重置所有勾选
+      </button>
+    </div>
+    <div class="footer-note">
+      ⏳ 一个月冲刺 · 每天动笔 · 错题复盘比刷题更重要
+    </div>
+  </div>
+
+  <script>
+    (function(){
+      const STORAGE_KEY = 'guokao_todo_v1';
+
+      const taskItems = document.querySelectorAll('.task-item');
+      const totalCountSpan = document.getElementById('totalCount');
+      const doneCountSpan = document.getElementById('doneCount');
+      const percentDisplay = document.getElementById('percentDisplay');
+      const progressFill = document.getElementById('progressFill');
+      const navBtns = document.querySelectorAll('.nav-btn');
+      const panels = {
+        data: document.getElementById('panel-data'),
+        judge: document.getElementById('panel-judge'),
+        verbal: document.getElementById('panel-verbal'),
+        politics: document.getElementById('panel-politics'),
+        common: document.getElementById('panel-common'),
+        quantity: document.getElementById('panel-quantity'),
+        essay: document.getElementById('panel-essay')
+      };
+
+      // ========== 1. 从 localStorage 读取已保存状态 ==========
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch (e) {
+          return {};
+        }
+      }
+
+      // ========== 2. 保存状态到 localStorage ==========
+      function saveState(state) {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {
+          // 隐私模式等可能写入失败，忽略
+        }
+      }
+
+      let savedState = loadState();
+
+      // ========== 3. 初始化每个任务 ==========
+      taskItems.forEach((item, index) => {
+        const checkbox = item.querySelector('.task-check');
+        let taskId = item.dataset.taskId;
+        if (!taskId) {
+          taskId = `task-${index}`;
+          item.dataset.taskId = taskId;
+        }
+
+        // 恢复勾选状态
+        if (savedState[taskId]) {
+          checkbox.checked = true;
+        }
+        updateItemStyle(item, checkbox.checked);
+
+        // 点击整行切换
+        item.addEventListener('click', (e) => {
+          if (e.target.tagName === 'INPUT') return;
+          checkbox.checked = !checkbox.checked;
+          handleChange(taskId, checkbox, item);
+        });
+
+        // checkbox 自身变化
+        checkbox.addEventListener('change', () => {
+          handleChange(taskId, checkbox, item);
+        });
+      });
+
+      // ========== 4. 勾选变化时：更新样式 + 保存 + 更新进度 ==========
+      function handleChange(taskId, checkbox, item) {
+        updateItemStyle(item, checkbox.checked);
+        savedState[taskId] = checkbox.checked;
+        saveState(savedState);
+        updateProgress();
+      }
+
+      function updateItemStyle(item, isChecked) {
+        item.classList.toggle('done', isChecked);
+      }
+
+      // ========== 5. 更新进度 ==========
+      function updateProgress() {
+        const total = taskItems.length;
+        let done = 0;
+        taskItems.forEach(item => {
+          const cb = item.querySelector('.task-check');
+          if (cb && cb.checked) done++;
+        });
+
+        totalCountSpan.textContent = total;
+        doneCountSpan.textContent = done;
+        const percent = total === 0 ? 0 : Math.round((done / total) * 100);
+        percentDisplay.innerHTML = `${percent}<small>%</small>`;
+        progressFill.style.width = percent + '%';
+      }
+
+      // ========== 6. 重置按钮 ==========
+      document.getElementById('resetAllBtn').addEventListener('click', () => {
+        if (!confirm('确定要清空所有勾选吗？')) return;
+        taskItems.forEach(item => {
+          const cb = item.querySelector('.task-check');
+          if (cb) {
+            cb.checked = false;
+            updateItemStyle(item, false);
+          }
+        });
+        savedState = {};
+        saveState(savedState);
+        updateProgress();
+      });
+
+      // ========== 7. 科目导航切换 ==========
+      navBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          navBtns.forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+
+          const subject = btn.dataset.subject;
+          Object.values(panels).forEach(p => {
+            if (p) p.classList.remove('active');
+          });
+
+          if (subject === 'all') {
+            Object.values(panels).forEach(p => {
+              if (p) p.classList.add('active');
+            });
+          } else if (panels[subject]) {
+            panels[subject].classList.add('active');
+          }
+        });
+      });
+
+      // ========== 8. 初始化 ==========
+      Object.values(panels).forEach(p => {
+        if (p) p.classList.add('active');
+      });
+      updateProgress();
+    })();
+  </script>
+</body>
+</html>
